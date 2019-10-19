@@ -1,0 +1,6 @@
+.idea/
+__pycache__/
+checkpoints/train/checkpoint
+checkpoints/
+IU-XRay/images/
+IU-XRay/reports/
