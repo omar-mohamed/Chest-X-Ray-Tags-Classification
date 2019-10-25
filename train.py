@@ -56,7 +56,6 @@ best_test_accuracy = 0
 best_test_accuracy_epoch = 0
 
 accuracies = []
-epoch_number = 0
 # run training
 while True:
 
