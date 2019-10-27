@@ -20,6 +20,9 @@ os.system("wget -P {}/ https://openi.nlm.nih.gov/imgs/collections/NLMCXR_reports
 # unzip
 os.system("tar -xzf {}/NLMCXR_png.tgz -C {}/".format(images_path, images_path))
 os.system("tar -xzf {}/NLMCXR_reports.tgz -C {}/".format(reports_path, reports_path))
+os.system("mv {}/ecgen-radiology/*.xml {}/".format(reports_path, reports_path))
+os.system("rm -rf {}/ecgen-radiology".format(reports_path))
+
 os.system("rm {}/NLMCXR_png.tgz".format(images_path))
 os.system("rm {}/NLMCXR_reports.tgz".format(reports_path))
 
