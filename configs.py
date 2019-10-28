@@ -20,8 +20,9 @@ class argHandler(dict):
         self.define('num_epochs', 100, 'maximum number of epochs')
         self.define('csv_label_columns', ['Tags'], 'the name of the label columns in the csv')
         self.define('classes',
-                    ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia',
-                     'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural Thickening', 'Hernia'],
+                    ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Lesion', 'Lung Opacity', 'Edema',
+                     'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture',
+                     'Support Devices'],
                     'the names of the output classes')
 
         self.define('multi_label_classification', True,
@@ -58,5 +59,7 @@ class argHandler(dict):
         for item in self._descriptions:
             currentSpacing = spacing - len(item)
             print('  --' + item + (' ' * currentSpacing) + self._descriptions[item])
-        print('')
         exit()
+
+python label.py --reports_path all_data.csv --output_path all_tags.csv
+

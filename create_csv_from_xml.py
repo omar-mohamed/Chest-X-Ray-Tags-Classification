@@ -28,9 +28,8 @@ def get_new_csv_dictionary():
                   'Patient ID': [],
                   'Findings': [],
                   'Impression': [],
-                  'Caption': [],
-                  'Tags': []
-                  }
+                  'Caption': []
+            }
 
 all_data_csv_dictionary = get_new_csv_dictionary()
 patient_id = 0
@@ -65,7 +64,7 @@ for report in reports:
                 reports_with_no_findings.append(report)
                 caption = impression
             else:
-                caption = impression + " " + findings
+                caption = "\""+impression + "\n" + findings + "\""
 
             for image in images:
                 images_captions[image.get("id") + ".png"] = caption
@@ -74,16 +73,8 @@ for report in reports:
                 all_data_csv_dictionary['Patient ID'].append(patient_id)
                 all_data_csv_dictionary['Findings'].append(findings)
                 all_data_csv_dictionary['Impression'].append(impression)
-                all_data_csv_dictionary['Caption'].append("startseq " + caption + " endseq")
-                existing_class_names=""
-                for class_name in FLAGS.classes:
-                    if class_name.lower() in caption.lower():
-                        existing_class_names += class_name + ","
-                        if class_name in dic.keys():
-                            dic[class_name] +=1
-                        else:
-                            dic[class_name] = 1
-                all_data_csv_dictionary['Tags'].append(existing_class_names)
+                all_data_csv_dictionary['Caption'].append(caption)
+
             reports_with_images[report] = img_ids
             text_of_reports[report] = caption
             patient_id = patient_id + 1
@@ -97,14 +88,12 @@ def split_train_test():
 
     test_csv_dictionary = get_new_csv_dictionary()
     train_csv_dictionary= get_new_csv_dictionary()
-
     def append_to_csv_dic(csv_dictionary,index):
         csv_dictionary['Image Index'].append(all_data_csv_dictionary['Image Index'][index])
         csv_dictionary['Patient ID'].append(all_data_csv_dictionary['Patient ID'][index])
         csv_dictionary['Findings'].append(all_data_csv_dictionary['Findings'][index])
         csv_dictionary['Impression'].append(all_data_csv_dictionary['Impression'][index])
         csv_dictionary['Caption'].append(all_data_csv_dictionary['Caption'][index])
-        csv_dictionary['Tags'].append(all_data_csv_dictionary['Tags'][index])
 
     for i in range(num_of_images):
         if i in test_indices:
@@ -118,11 +107,19 @@ def split_train_test():
 
 train_csv,test_csv=split_train_test()
 
-def save_csv(csv_dictionary,csv_name):
-    df = pd.DataFrame(csv_dictionary)
-    df.to_csv(os.path.join("IU-XRay",csv_name), index=False)
+def save_csv(csv_dictionary,csv_name,just_caption=False):
+    if not just_caption:
+        df = pd.DataFrame(csv_dictionary)
+        df.to_csv(os.path.join("IU-XRay",csv_name), index=False)
+    else:
+        df = pd.DataFrame({'Caption':csv_dictionary['Caption']})
+        df.to_csv(os.path.join("IU-XRay",csv_name), index=False,header=False)
+
+
 
 save_csv(all_data_csv_dictionary,"all_data.csv")
 save_csv(train_csv,"training_set.csv")
 save_csv(test_csv,"testing_set.csv")
 
+save_csv(train_csv,"training_set_captions.csv",True)
+save_csv(test_csv,"testing_set_captions.csv",True)
