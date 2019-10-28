@@ -60,6 +60,3 @@ class argHandler(dict):
             currentSpacing = spacing - len(item)
             print('  --' + item + (' ' * currentSpacing) + self._descriptions[item])
         exit()
-
-python label.py --reports_path all_data.csv --output_path all_tags.csv
-
