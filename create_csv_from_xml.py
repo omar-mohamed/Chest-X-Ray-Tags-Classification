@@ -121,5 +121,7 @@ save_csv(all_data_csv_dictionary,"all_data.csv")
 save_csv(train_csv,"training_set.csv")
 save_csv(test_csv,"testing_set.csv")
 
+save_csv(all_data_csv_dictionary,"all_data_captions.csv",True)
+
 save_csv(train_csv,"training_set_captions.csv",True)
 save_csv(test_csv,"testing_set_captions.csv",True)
