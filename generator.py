@@ -116,8 +116,7 @@ class AugmentedImageSequence(Sequence):
         index = 0
         for label in y:
             labels = self.classes_to_indices(str(label[0]).split(","))
-            if labels != []:
-                onehot[index][labels] = 1
+            onehot[index][labels] = 1
             index += 1
         return onehot
 
