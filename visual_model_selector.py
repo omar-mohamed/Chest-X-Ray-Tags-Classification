@@ -160,8 +160,9 @@ class ModelFactory:
             predictions = classifier(base_model_output)
             loaded_model = Model(inputs=img_input, outputs=predictions)
 
-        loaded_model.summary()
-        if classifier is not None:
-            classifier.summary()
+        if FLAGS.show_model_summary:
+            loaded_model.summary()
+            if classifier is not None:
+                classifier.summary()
 
         return loaded_model

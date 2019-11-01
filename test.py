@@ -3,7 +3,9 @@ from __future__ import absolute_import, division
 from visual_model_selector import ModelFactory
 from generator import AugmentedImageSequence
 from configs import argHandler  # Import the default arguments
-from model_utils import load_model, get_accuracy_from_generator, set_gpu_usage
+from model_utils import set_gpu_usage
+from tensorflow.keras.models import load_model
+from tensorflow.keras import metrics
 
 FLAGS = argHandler()
 FLAGS.setDefaults()
@@ -22,11 +24,22 @@ test_generator = AugmentedImageSequence(
     target_size=FLAGS.image_target_size,
     shuffle_on_epoch_end=True,
 )
-# load classifier from saved weights or get a new one
 if FLAGS.load_model_path != '' and FLAGS.load_model_path is not None:
-    visual_model = load_model(FLAGS.load_model_path, FLAGS.load_model_name)
+    visual_model = load_model(FLAGS.load_model_path)
+    if FLAGS.show_model_summary:
+        visual_model.summary()
 else:
     visual_model = model_factory.get_model(FLAGS)
 
-test_accuracy = get_accuracy_from_generator(visual_model, test_generator, FLAGS.multi_label_classification)
-print('Test Accuracy: %.2f' % (test_accuracy))
+if FLAGS.multi_label_classification:
+    visual_model.compile(loss='binary_crossentropy',
+                         metrics=[metrics.BinaryAccuracy(threshold=FLAGS.multilabel_threshold)])
+else:
+    visual_model.compile(loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+visual_model.evaluate_generator(
+    generator=test_generator,
+    steps=test_generator.steps,
+    workers=FLAGS.generator_workers,
+    max_queue_size=FLAGS.generator_queue_length,
+    verbose=1)

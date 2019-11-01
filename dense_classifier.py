@@ -21,3 +21,5 @@ def get_classifier(input_length, multi_label_classification, layer_sizes=[100], 
         model.add(Dense(output_size, activation='softmax', name="predictions"))
 
     return model
+
+

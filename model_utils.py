@@ -19,7 +19,7 @@ def set_gpu_usage(gpu_memory_fraction):
     #     sess = tf.Session(config=tf.ConfigProto(device_count={'GPU': 0}))
     # K.set_session(sess)
 
-def get_optimizer(optimizer_type, learning_rate, lr_decay):
+def get_optimizer(optimizer_type, learning_rate, lr_decay=0):
     optimizer_class = getattr(importlib.import_module("tensorflow.keras.optimizers"), optimizer_type)
     optimizer = optimizer_class(lr=learning_rate, decay=lr_decay)
     return optimizer
@@ -104,3 +104,33 @@ def get_accuracy(predictions, labels, multi_label_classification):
         predictions = np.argmax(predictions, axis=1)
         true_predictions_count = np.sum(predictions == labels)
     return (true_predictions_count / labels.shape[0]) * 100.0
+
+
+def get_sample_counts(labels):
+
+    total_count = labels.shape[0]
+    positive_counts = np.sum(labels, axis=0)
+    classes=[]
+    for i in range(labels.shape[1]):
+        classes.append(str(i))
+    class_positive_counts = dict(zip(classes, positive_counts))
+    return total_count, class_positive_counts
+
+
+def get_class_weights(labels, multiply):
+
+    def get_single_class_weight(pos_counts, total_counts):
+        denominator = (total_counts - pos_counts) * multiply + pos_counts
+        return {
+            0: pos_counts / denominator,
+            1: (denominator - pos_counts) / denominator,
+        }
+
+    total_counts, class_positive_counts = get_sample_counts(labels)
+    class_names = list(class_positive_counts.keys())
+    label_counts = np.array(list(class_positive_counts.values()))
+    class_weights = []
+    for i, class_name in enumerate(class_names):
+        class_weights.append(get_single_class_weight(label_counts[i], total_counts))
+
+    return class_weights
