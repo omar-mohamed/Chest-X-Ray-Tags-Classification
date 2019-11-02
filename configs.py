@@ -49,7 +49,7 @@ class argHandler(dict):
         self.define('batch_size', 2, 'batch size for training and testing')
         self.define('multilabel_threshold', 0.5,
                     'The threshold from which to detect a class. Only used with multi label classification.')
-        self.define('generator_workers', 8, 'The number of cpu workers generating batches.')
+        self.define('generator_workers', 4, 'The number of cpu workers generating batches.')
         self.define('generator_queue_length', 12, 'The maximum number of batches in the queue to be trained on.')
         self.define('minimum_learning_rate', 1e-8, 'The minimum possible learning rate when decaying')
         self.define('reduce_lr_patience', 2,

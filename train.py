@@ -9,6 +9,8 @@ from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint, Tenso
 import os
 from tensorflow.keras.models import load_model
 from augmenter import augmenter
+from auroc import MultipleClassAUROC
+import json
 
 FLAGS = argHandler()
 FLAGS.setDefaults()
@@ -28,7 +30,7 @@ def get_generator(csv_path, data_augmenter=None):
         batch_size=FLAGS.batch_size,
         target_size=FLAGS.image_target_size,
         augmenter=data_augmenter,
-        shuffle_on_epoch_end=True,
+        shuffle_on_epoch_end=False,
     )
 
 
@@ -39,35 +41,52 @@ if FLAGS.use_class_balancing and FLAGS.multi_label_classification:
 test_generator = get_generator(FLAGS.test_csv)
 
 # load classifier from saved weights or get a new one
+training_stats = {}
+learning_rate = FLAGS.learning_rate
+
 if FLAGS.load_model_path != '' and FLAGS.load_model_path is not None:
     visual_model = load_model(FLAGS.load_model_path)
     if FLAGS.show_model_summary:
         visual_model.summary()
+    training_stats_file = os.path.join(FLAGS.save_model_path, ".training_stats.json")
+    if os.path.isfile(training_stats_file):
+        training_stats = json.load(open(training_stats_file))
+        learning_rate = training_stats['lr']
+        print("Will continue from learning rate: {}".format(learning_rate))
 else:
     visual_model = model_factory.get_model(FLAGS)
 
-opt = get_optimizer(FLAGS.optimizer_type, FLAGS.learning_rate)
+opt = get_optimizer(FLAGS.optimizer_type, learning_rate)
 
 if FLAGS.multi_label_classification:
     visual_model.compile(loss='binary_crossentropy', optimizer=opt,
                          metrics=[metrics.BinaryAccuracy(threshold=FLAGS.multilabel_threshold)])
-    checkpoint = ModelCheckpoint(os.path.join(FLAGS.save_model_path, 'best_model.hdf5'), monitor='val_binary_accuracy',
-                                 verbose=1,
-                                 save_best_only=True, mode='max')
 else:
     visual_model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-    checkpoint = ModelCheckpoint(os.path.join(FLAGS.save_model_path, 'best_model.hdf5'), monitor='val_accuracy',
-                                 verbose=1,
-                                 save_best_only=True, mode='max')
+    training_stats_file = {}
+
+checkpoint = ModelCheckpoint(os.path.join(FLAGS.save_model_path, 'latest_model.hdf5'),
+                             verbose=1)
+
 try:
     os.makedirs(FLAGS.save_model_path)
 except:
     print("path already exists")
 
+auroc = MultipleClassAUROC(
+    sequence=test_generator,
+    class_names=FLAGS.classes,
+    weights_path=os.path.join(FLAGS.save_model_path, 'latest_model.hdf5'),
+    output_weights_path=os.path.join(FLAGS.save_model_path, 'best_val_auroc_model.hdf5'),
+    stats=training_stats,
+    workers=FLAGS.generator_workers,
+)
+
 callbacks = [
     ReduceLROnPlateau(monitor='val_loss', factor=FLAGS.learning_rate_decay_factor, patience=FLAGS.reduce_lr_patience,
                       verbose=1, mode="min", min_lr=FLAGS.minimum_learning_rate),
     checkpoint,
+    auroc
     # TensorBoard(log_dir=os.path.join(FLAGS.save_model_path, "logs"), batch_size=FLAGS.batch_size)
 ]
 

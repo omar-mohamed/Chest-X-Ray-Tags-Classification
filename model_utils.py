@@ -7,6 +7,7 @@ import numpy as np
 from tensorflow.keras import backend as K
 import importlib
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import roc_auc_score
 
 
 def set_gpu_usage(gpu_memory_fraction):
@@ -74,18 +75,16 @@ def classify_image(img, model, multi_label_classification, target_size=(224, 224
 
 
 # predict on data from generator and calculate accuracy
-def get_accuracy_from_generator(model, generator, multi_label_classification):
+def get_accuracy_from_generator(model, generator, multi_label_classification,threshold):
     true_predictions_count = 0.0
     data_count = 0.0
     # max=0
     for step in range(generator.steps):
-        (batch_x, batch_y, _) = next(generator)
+        (batch_x, batch_y) = next(generator)
         predictions = model.predict(batch_x)
-        # if max < np.max(predictions):
-        #     max=np.max(predictions)
         if multi_label_classification:
-            predictions[predictions >= 0.5] = 1
-            predictions[predictions < 0.5] = 0
+            predictions[predictions >= threshold] = 1
+            predictions[predictions < threshold] = 0
             true_predictions_count += np.sum((predictions == batch_y).all(axis=1))
         else:
             predictions = np.argmax(predictions, axis=1)
@@ -105,6 +104,21 @@ def get_accuracy(predictions, labels, multi_label_classification):
         true_predictions_count = np.sum(predictions == labels)
     return (true_predictions_count / labels.shape[0]) * 100.0
 
+
+def get_auc(pred,labels,class_names):
+    current_auroc = []
+    for i in range(len(class_names)):
+        try:
+            score = roc_auc_score(labels[:, i], pred[:, i])
+        except ValueError:
+            score = 0
+        current_auroc.append(score)
+        print(f"{i + 1}. {class_names[i]}: {score}")
+    print("*********************************")
+
+    mean_auroc = np.mean(current_auroc)
+    print(f"mean auroc: {mean_auroc}")
+    return mean_auroc
 
 def get_sample_counts(labels):
 

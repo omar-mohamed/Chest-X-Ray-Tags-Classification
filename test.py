@@ -3,7 +3,7 @@ from __future__ import absolute_import, division
 from visual_model_selector import ModelFactory
 from generator import AugmentedImageSequence
 from configs import argHandler  # Import the default arguments
-from model_utils import set_gpu_usage
+from model_utils import set_gpu_usage, get_auc
 from tensorflow.keras.models import load_model
 from tensorflow.keras import metrics
 
@@ -22,7 +22,7 @@ test_generator = AugmentedImageSequence(
     source_image_dir=FLAGS.image_directory,
     batch_size=FLAGS.batch_size,
     target_size=FLAGS.image_target_size,
-    shuffle_on_epoch_end=True,
+    shuffle_on_epoch_end=False,
 )
 if FLAGS.load_model_path != '' and FLAGS.load_model_path is not None:
     visual_model = load_model(FLAGS.load_model_path)
@@ -34,12 +34,18 @@ else:
 if FLAGS.multi_label_classification:
     visual_model.compile(loss='binary_crossentropy',
                          metrics=[metrics.BinaryAccuracy(threshold=FLAGS.multilabel_threshold)])
+
+    y_hat = visual_model.predict_generator(test_generator, steps=test_generator.steps, workers=FLAGS.generator_workers,
+                                           max_queue_size=FLAGS.generator_queue_length, verbose=1)
+    y = test_generator.get_y_true()
+    get_auc(y_hat, y, FLAGS.classes)
 else:
     visual_model.compile(loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-visual_model.evaluate_generator(
-    generator=test_generator,
-    steps=test_generator.steps,
-    workers=FLAGS.generator_workers,
-    max_queue_size=FLAGS.generator_queue_length,
-    verbose=1)
+
+    visual_model.evaluate_generator(
+        generator=test_generator,
+        steps=test_generator.steps,
+        workers=FLAGS.generator_workers,
+        max_queue_size=FLAGS.generator_queue_length,
+        verbose=1)
