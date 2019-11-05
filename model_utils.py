@@ -6,9 +6,8 @@ import os
 import numpy as np
 from tensorflow.keras import backend as K
 import importlib
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import roc_auc_score
-
+from sklearn.metrics import roc_auc_score, precision_recall_fscore_support, average_precision_score, accuracy_score, hamming_loss, \
+    f1_score
 
 def set_gpu_usage(gpu_memory_fraction):
     pass
@@ -105,7 +104,8 @@ def get_accuracy(predictions, labels, multi_label_classification):
     return (true_predictions_count / labels.shape[0]) * 100.0
 
 
-def get_auc(pred,labels,class_names):
+
+def get_evaluation_metrics(pred,labels,class_names, threshold=0.5):
     current_auroc = []
     for i in range(len(class_names)):
         try:
@@ -118,7 +118,14 @@ def get_auc(pred,labels,class_names):
 
     mean_auroc = np.mean(current_auroc)
     print(f"mean auroc: {mean_auroc}")
-    return mean_auroc
+
+    prec, rec, fscore, support = precision_recall_fscore_support(labels, pred >= threshold, average='macro')
+    AP = average_precision_score(labels, pred)
+    f1 = f1_score(labels, pred >= threshold, average='macro')
+    exact_accuracy = accuracy_score(labels, pred >= threshold)
+    ham_loss = hamming_loss(labels, pred >= threshold)
+    print(f"precision:{prec:.2f}, recall: {rec:.2f}, fscore: {fscore:.2f}, AP: {AP:.2f}, f1_score {f1:.2f}, exact match accuracy: {exact_accuracy:.2f}, hamming loss: {ham_loss:.2f}")
+    return mean_auroc, prec,rec,fscore, AP, f1, exact_accuracy, ham_loss
 
 def get_sample_counts(labels):
 

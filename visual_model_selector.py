@@ -46,7 +46,37 @@ class ModelFactory:
             ),
             ResNet50=dict(
                 input_shape=(224, 224, 3),
-                module_name="resnet50",
+                module_name="resnet",
+                last_conv_layer="activation_49",
+            ),
+            ResNet50V2=dict(
+                input_shape=(224, 224, 3),
+                module_name="resnet_v2",
+                last_conv_layer="activation_49",
+            ),
+            ResNet101=dict(
+                input_shape=(224, 224, 3),
+                module_name="resnet",
+                last_conv_layer="activation_49",
+            ),
+            ResNet101V2=dict(
+                input_shape=(224, 224, 3),
+                module_name="resnet_v2",
+                last_conv_layer="activation_49",
+            ),
+            ResNet152=dict(
+                input_shape=(224, 224, 3),
+                module_name="resnet",
+                last_conv_layer="activation_49",
+            ),
+            ResNet152V2=dict(
+                input_shape=(224, 224, 3),
+                module_name="resnet_v2",
+                last_conv_layer="activation_49",
+            ),
+            ResNeXt50=dict(
+                input_shape=(224, 224, 3),
+                module_name="resnext",
                 last_conv_layer="activation_49",
             ),
             InceptionV3=dict(

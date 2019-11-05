@@ -12,7 +12,7 @@ class argHandler(dict):
         self.define('image_directory', './IU-XRay/images',
                     'path to folder containing the patient folders which containg the images')
         self.define('visual_model_name', 'MobileNetV2',
-                    'select from (VGG16, VGG19, DenseNet121, DenseNet169, DenseNet201, Xception, ResNet50, InceptionV3, InceptionResNetV2, NASNetMobile, NASNetLarge, MobileNet, MobileNetV2)')
+                    'select from (VGG16, VGG19, DenseNet121, DenseNet169, DenseNet201, Xception, ResNet50, ResNet101, ResNet152, ResNet50V2, ResNet101V2, ResNet152V2, InceptionV3, InceptionResNetV2, NASNetMobile, NASNetLarge, MobileNet, MobileNetV2)')
         self.define('use_chexnet_weights', False,
                     'use pre-trained chexnet weights. Note only works with DenseNet121. If you use this option without popping layers it will have the classifier intact')
         self.define('chexnet_weights_path', 'pretrained_models/chexnet_densenet121_weights.h5', 'chexnet weights path')

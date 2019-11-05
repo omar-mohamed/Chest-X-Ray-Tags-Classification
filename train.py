@@ -35,10 +35,11 @@ def get_generator(csv_path, data_augmenter=None):
 
 
 train_generator = get_generator(FLAGS.train_csv, augmenter)
+test_generator = get_generator(FLAGS.test_csv)
+
 class_weights = None
 if FLAGS.use_class_balancing and FLAGS.multi_label_classification:
     class_weights = get_class_weights(train_generator.y, FLAGS.positive_weights_multiply)
-test_generator = get_generator(FLAGS.test_csv)
 
 # load classifier from saved weights or get a new one
 training_stats = {}

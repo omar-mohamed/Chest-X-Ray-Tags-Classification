@@ -4,8 +4,8 @@ import numpy as np
 import os
 import shutil
 from tensorflow.keras.callbacks import Callback
-from sklearn.metrics import roc_auc_score
-
+from sklearn.metrics import precision_recall_fscore_support, average_precision_score, accuracy_score, hamming_loss, \
+    f1_score, roc_auc_score
 
 class MultipleClassAUROC(Callback):
     """
@@ -56,6 +56,7 @@ class MultipleClassAUROC(Callback):
         y_hat = self.model.predict_generator(self.sequence, workers=self.workers)
         y = self.sequence.get_y_true()
 
+
         print(f"*** epoch#{epoch + 1} dev auroc ***")
         current_auroc = []
         for i in range(len(self.class_names)):
@@ -68,6 +69,13 @@ class MultipleClassAUROC(Callback):
             print(f"{i+1}. {self.class_names[i]}: {score}")
         print("*********************************")
 
+        prec, rec, fscore, support = precision_recall_fscore_support(y, y_hat >= 0.5, average='macro')
+        AP = average_precision_score(y, y_hat)
+        f1 = f1_score(y, y_hat >= 0.5, average='macro')
+        exact_accuracy = accuracy_score(y, y_hat >= 0.5)
+        ham_loss = hamming_loss(y, y_hat >= 0.5)
+        print(
+            f"precision:{prec:.2f}, recall: {rec:.2f}, fscore: {fscore:.2f}, AP: {AP:.2f}, f1_score {f1:.2f}, exact match accuracy: {exact_accuracy:.2f}, hamming loss: {ham_loss:.2f}")
         # customize your multiple class metrics here
         mean_auroc = np.mean(current_auroc)
         print(f"mean auroc: {mean_auroc}")
@@ -88,6 +96,14 @@ class MultipleClassAUROC(Callback):
 
             print(f"update model file: {self.weights_path} -> {self.best_weights_path}")
             self.stats["best_mean_auroc"] = mean_auroc
+            self.stats["AP"] = AP
+            self.stats["precision"] = prec
+            self.stats["recall"] = rec
+            self.stats["fscore"] = fscore
+            self.stats["hamming_loss"] = ham_loss
+            self.stats["f1_score"] = ham_loss
+            self.stats["exact_accuracy"] = exact_accuracy
+
             print("*********************************")
         else:
             print(f"best auroc is still {self.stats['best_mean_auroc']}")
