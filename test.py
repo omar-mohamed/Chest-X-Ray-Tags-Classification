@@ -40,7 +40,7 @@ else:
     visual_model = model_factory.get_model(FLAGS)
 
 def get_metrics_from_generator(generator,threshold=0.5, verbose=0):
-    y_hat = visual_model.predict_generator(generator, steps=test_generator.steps, workers=FLAGS.generator_workers,
+    y_hat = visual_model.predict_generator(generator, steps=generator.steps, workers=FLAGS.generator_workers,
                                            max_queue_size=FLAGS.generator_queue_length, verbose=verbose)
     y = generator.get_y_true()
     get_evaluation_metrics(y_hat, y, FLAGS.classes,threshold=threshold)
