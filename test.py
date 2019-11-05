@@ -42,7 +42,7 @@ else:
 def get_metrics_from_generator(generator,threshold=0.5, verbose=0):
     y_hat = visual_model.predict_generator(generator, steps=test_generator.steps, workers=FLAGS.generator_workers,
                                            max_queue_size=FLAGS.generator_queue_length, verbose=verbose)
-    y = test_generator.get_y_true()
+    y = generator.get_y_true()
     get_evaluation_metrics(y_hat, y, FLAGS.classes,threshold=threshold)
 
 if FLAGS.multi_label_classification:
@@ -50,9 +50,9 @@ if FLAGS.multi_label_classification:
                          metrics=[metrics.BinaryAccuracy(threshold=FLAGS.multilabel_threshold)])
 
     print("***************Train Metrics*********************")
-    get_metrics_from_generator(train_generator)
+    get_metrics_from_generator(train_generator, FLAGS.multilabel_threshold)
     print("***************Test Metrics**********************")
-    get_metrics_from_generator(test_generator)
+    get_metrics_from_generator(test_generator, FLAGS.multilabel_threshold)
 
 else:
     visual_model.compile(loss='sparse_categorical_crossentropy', metrics=['accuracy'])
