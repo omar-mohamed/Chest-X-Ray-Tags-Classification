@@ -3,7 +3,8 @@ import xml.etree.ElementTree as ET
 import random
 import pandas as pd
 from configs import argHandler  # Import the default arguments
-
+import numpy as np
+import re
 FLAGS = argHandler()
 FLAGS.setDefaults()
 
@@ -28,12 +29,16 @@ def get_new_csv_dictionary():
                   'Patient ID': [],
                   'Findings': [],
                   'Impression': [],
-                  'Caption': []
+                  'Caption': [],
+                  'Manual Tags': []
             }
 
 all_data_csv_dictionary = get_new_csv_dictionary()
 patient_id = 0
 dic = {}
+manual_tags_dic = {}
+automatic_tags_dic = {}
+manual_tags_list=[]
 
 for report in reports:
 
@@ -66,7 +71,23 @@ for report in reports:
             else:
                 caption = "\""+impression + "\n" + findings + "\""
 
+            manual_tags = root.find("MeSH").findall("major")
+            # automatic_tags=root.find("MeSH").findall("automatic")
+            manual_tags_tmp=[]
+            for manual_tag in manual_tags:
+                manual_tag = manual_tag.text.lower().strip()
+                manual_tag = re.split('/|,',manual_tag)
+                for word in manual_tag:
+                    word=word.strip()
+                    if word in manual_tags_dic.keys():
+                        manual_tags_dic[word] += 1
+                    else:
+                        manual_tags_dic[word] = 1
+                    manual_tags_tmp.append(word)
+
             for image in images:
+                manual_tags_list.append(manual_tags_tmp)
+
                 images_captions[image.get("id") + ".png"] = caption
                 img_ids.append(image.get("id") + ".png")
                 all_data_csv_dictionary['Image Index'].append(image.get("id") + ".png")
@@ -79,7 +100,23 @@ for report in reports:
             text_of_reports[report] = caption
             patient_id = patient_id + 1
 
+appearance_limit=25
+selected_classes={}
+for tags_list in manual_tags_list:
+    tags_str=''
+    tags_list=list(set(tags_list))
+    for tag in tags_list:
+        if manual_tags_dic[tag] > appearance_limit:
+            selected_classes[tag]=manual_tags_dic[tag]
+            if tags_str == '':
+                tags_str += tag
+            else:
+                tags_str +=','+tag
+    if tags_str == '':
+        tags_str ='normal'
+    all_data_csv_dictionary['Manual Tags'].append(tags_str)
 
+print(selected_classes.keys())
 
 def split_train_test():
     num_test_images=500
@@ -94,6 +131,7 @@ def split_train_test():
         csv_dictionary['Findings'].append(all_data_csv_dictionary['Findings'][index])
         csv_dictionary['Impression'].append(all_data_csv_dictionary['Impression'][index])
         csv_dictionary['Caption'].append(all_data_csv_dictionary['Caption'][index])
+        csv_dictionary['Manual Tags'].append(all_data_csv_dictionary['Manual Tags'][index])
 
     for i in range(num_of_images):
         if i in test_indices:
@@ -117,11 +155,16 @@ def save_csv(csv_dictionary,csv_name,just_caption=False):
 
 
 
-save_csv(all_data_csv_dictionary,"all_data.csv")
-save_csv(train_csv,"training_set.csv")
-save_csv(test_csv,"testing_set.csv")
+save_csv(all_data_csv_dictionary,"all_data_manual_tags.csv")
+save_csv(train_csv,"training_set_manual_tags.csv")
+save_csv(test_csv,"testing_set_manual_tags.csv")
 
-save_csv(all_data_csv_dictionary,"all_data_captions.csv",True)
 
-save_csv(train_csv,"training_set_captions.csv",True)
-save_csv(test_csv,"testing_set_captions.csv",True)
+# for automatic_tag in automatic_tags:
+#     automatic_tag=automatic_tag.text.lower()
+#     automatic_tag = automatic_tag.split('/')
+#     for word in automatic_tag:
+#         if word.strip() in automatic_tags_dic.keys():
+#             automatic_tags_dic[word.strip()] +=1
+#         else:
+#             automatic_tags_dic[word.strip()] = 1
