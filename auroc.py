@@ -5,18 +5,19 @@ import os
 import shutil
 from tensorflow.keras.callbacks import Callback
 from sklearn.metrics import precision_recall_fscore_support, average_precision_score, accuracy_score, hamming_loss, \
-    f1_score, roc_auc_score
+     roc_auc_score
 
 class MultipleClassAUROC(Callback):
     """
     Monitor mean AUROC and update model
     """
-    def __init__(self, sequence, class_names, weights_path,output_weights_path, stats=None, workers=1):
+    def __init__(self, sequence, class_names, weights_path,output_weights_path,confidence_thresh=0.5, stats=None, workers=1):
         super(Callback, self).__init__()
         self.sequence = sequence
         self.workers = workers
         self.class_names = class_names
         self.weights_path = weights_path
+        self.confidence_thresh=confidence_thresh
         self.best_weights_path = os.path.join(
             os.path.split(weights_path)[0],
             f"{os.path.split(output_weights_path)[1]}",
@@ -69,13 +70,12 @@ class MultipleClassAUROC(Callback):
             print(f"{i+1}. {self.class_names[i]}: {score}")
         print("*********************************")
 
-        prec, rec, fscore, support = precision_recall_fscore_support(y, y_hat >= 0.5, average='macro')
+        prec, rec, fscore, support = precision_recall_fscore_support(y, y_hat >= self.confidence_thresh, average='macro')
         AP = average_precision_score(y, y_hat)
-        f1 = f1_score(y, y_hat >= 0.5, average='macro')
-        exact_accuracy = accuracy_score(y, y_hat >= 0.5)
-        ham_loss = hamming_loss(y, y_hat >= 0.5)
+        exact_accuracy = accuracy_score(y, y_hat >= self.confidence_thresh)
+        ham_loss = hamming_loss(y, y_hat >= self.confidence_thresh)
         print(
-            f"precision:{prec:.2f}, recall: {rec:.2f}, fscore: {fscore:.2f}, AP: {AP:.2f}, f1_score {f1:.2f}, exact match accuracy: {exact_accuracy:.2f}, hamming loss: {ham_loss:.2f}")
+            f"precision:{prec:.2f}, recall: {rec:.2f}, fscore: {fscore:.2f}, AP: {AP:.2f}, exact match accuracy: {exact_accuracy:.2f}, hamming loss: {ham_loss:.2f}")
         # customize your multiple class metrics here
         mean_auroc = np.mean(current_auroc)
         print(f"mean auroc: {mean_auroc}")

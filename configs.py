@@ -5,6 +5,8 @@ class argHandler(dict):
     __delattr__ = dict.__delitem__
     _descriptions = {'help, --h, -h': 'show this super helpful message and exit'}
 
+
+
     def setDefaults(self):
         self.define('train_csv', './IU-XRay/training_set_manual_tags.csv',
                     'path to training csv containing the images names and the labels')
@@ -34,7 +36,7 @@ class argHandler(dict):
         self.define('final_layer_pooling', 'avg', 'the pooling to be used as a final layer to the visual model')
         self.define('load_model_path', '',
                     'a path containing the checkpoints. If provided with load_model_name the system will continue the training from that point or use it in testing.')
-        self.define('save_model_path', './DenseNet121_17',
+        self.define('save_model_path', 'DenseNet121_17',
                     'where to save the checkpoints. The path will be created if it does not exist. The system saves every epoch by default')
         self.define('save_best_model_only', True,
                     'Only save the best weights on validation loss')

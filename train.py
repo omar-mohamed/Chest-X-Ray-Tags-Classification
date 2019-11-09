@@ -74,11 +74,15 @@ try:
 except:
     print("path already exists")
 
+with open(os.path.join(FLAGS.save_model_path,'configs.json'), 'w') as fp:
+    json.dump(FLAGS, fp, indent=4)
+
 auroc = MultipleClassAUROC(
     sequence=test_generator,
     class_names=FLAGS.classes,
     weights_path=os.path.join(FLAGS.save_model_path, 'latest_model.hdf5'),
-    output_weights_path=os.path.join(FLAGS.save_model_path, 'best_val_auroc_model.hdf5'),
+    output_weights_path=os.path.join(FLAGS.save_model_path, 'best_model.hdf5'),
+    confidence_thresh=FLAGS.multilabel_threshold,
     stats=training_stats,
     workers=FLAGS.generator_workers,
 )
@@ -87,16 +91,16 @@ callbacks = [
     ReduceLROnPlateau(monitor='val_loss', factor=FLAGS.learning_rate_decay_factor, patience=FLAGS.reduce_lr_patience,
                       verbose=1, mode="min", min_lr=FLAGS.minimum_learning_rate),
     checkpoint,
-    auroc
-    # TensorBoard(log_dir=os.path.join(FLAGS.save_model_path, "logs"), batch_size=FLAGS.batch_size)
+    auroc,
+    TensorBoard(log_dir=os.path.join(FLAGS.save_model_path, "logs"))
 ]
 
 visual_model.fit_generator(
     generator=train_generator,
-    steps_per_epoch=train_generator.steps,
+    steps_per_epoch=2,
     epochs=FLAGS.num_epochs,
     validation_data=test_generator,
-    validation_steps=test_generator.steps,
+    validation_steps=2,
     workers=FLAGS.generator_workers,
     callbacks=callbacks,
     max_queue_size=FLAGS.generator_queue_length,
