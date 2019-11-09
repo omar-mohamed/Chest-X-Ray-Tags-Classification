@@ -97,10 +97,10 @@ callbacks = [
 
 visual_model.fit_generator(
     generator=train_generator,
-    steps_per_epoch=2,
+    steps_per_epoch=train_generator.steps,
     epochs=FLAGS.num_epochs,
     validation_data=test_generator,
-    validation_steps=2,
+    validation_steps=test_generator.steps,
     workers=FLAGS.generator_workers,
     callbacks=callbacks,
     max_queue_size=FLAGS.generator_queue_length,
