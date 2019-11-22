@@ -101,12 +101,14 @@ for report in reports:
             patient_id = patient_id + 1
 
 appearance_limit=25
+to_ignore=['technical quality of image unsatisfactory','surgical instruments','no indexing','multiple','inserted']
+
 selected_classes={}
 for tags_list in manual_tags_list:
     tags_str=''
     tags_list=list(set(tags_list))
     for tag in tags_list:
-        if manual_tags_dic[tag] > appearance_limit:
+        if manual_tags_dic[tag] > appearance_limit and tag not in to_ignore:
             selected_classes[tag]=manual_tags_dic[tag]
             if tags_str == '':
                 tags_str += tag
@@ -155,9 +157,9 @@ def save_csv(csv_dictionary,csv_name,just_caption=False):
 
 
 
-save_csv(all_data_csv_dictionary,"all_data_manual_tags.csv")
-save_csv(train_csv,"training_set_manual_tags.csv")
-save_csv(test_csv,"testing_set_manual_tags.csv")
+save_csv(all_data_csv_dictionary,"all_data_manual_tags_100.csv")
+save_csv(train_csv,"training_set_manual_tags_100.csv")
+save_csv(test_csv,"testing_set_manual_tags_100.csv")
 
 
 # for automatic_tag in automatic_tags:

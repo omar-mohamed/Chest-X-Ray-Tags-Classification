@@ -8,9 +8,9 @@ class argHandler(dict):
 
 
     def setDefaults(self):
-        self.define('train_csv', './IU-XRay/training_set_manual_tags.csv',
+        self.define('train_csv', './IU-XRay/training_set_manual_tags_100.csv',
                     'path to training csv containing the images names and the labels')
-        self.define('test_csv', './IU-XRay/testing_set_manual_tags.csv',
+        self.define('test_csv', './IU-XRay/testing_set_manual_tags_100.csv',
                     'path to testing csv containing the images names and the labels')
         self.define('image_directory', './IU-XRay/images',
                     'path to folder containing the patient folders which containg the images')
