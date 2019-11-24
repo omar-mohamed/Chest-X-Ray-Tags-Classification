@@ -7,7 +7,7 @@ from tensorflow.keras import regularizers
 
 # method to return the dense classifier
 def get_classifier(input_length, multi_label_classification, layer_sizes=[100], output_size=2):
-    model = Sequential()
+    model = Sequential(name='Classifier')
     model.add(Flatten(input_shape=[input_length]))
     for layer_size in layer_sizes:
         if layer_size < 1:

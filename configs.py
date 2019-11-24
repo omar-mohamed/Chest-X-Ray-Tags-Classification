@@ -20,6 +20,8 @@ class argHandler(dict):
                     'use pre-trained chexnet weights. Note only works with DenseNet121. If you use this option without popping layers it will have the classifier intact')
         self.define('chexnet_weights_path', 'pretrained_models/chexnet_densenet121_weights.h5', 'chexnet weights path')
         self.define('image_target_size', (224, 224, 3), 'the target size to resize the image')
+        self.define('cnn_downscaling_factor', 0, 'Controls the cnn layers responsible for downscaling the input image. if input image is 512x512 and downscaling factor is set to 2 then the downscaling cnn will output image with size 128x128. Note it is a learnable net and if set to 0 it will skip it')
+        self.define('cnn_downscaling_filters', 64, 'Number of filters in the downscaling model')
         self.define('num_epochs', 100, 'maximum number of epochs')
         self.define('csv_label_columns', ['Manual Tags'], 'the name of the label columns in the csv')
         self.define('classes',classes,

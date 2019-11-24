@@ -49,7 +49,7 @@ if FLAGS.load_model_path != '' and FLAGS.load_model_path is not None:
     visual_model = load_model(FLAGS.load_model_path)
     if FLAGS.show_model_summary:
         visual_model.summary()
-    training_stats_file = os.path.join(FLAGS.save_model_path, ".training_stats.json")
+    training_stats_file = os.path.join(FLAGS.save_model_path, "training_stats.json")
     if os.path.isfile(training_stats_file):
         training_stats = json.load(open(training_stats_file))
         learning_rate = training_stats['lr']

@@ -28,7 +28,7 @@ class MultipleClassAUROC(Callback):
         )
         self.stats_output_path = os.path.join(
             os.path.split(weights_path)[0],
-            ".training_stats.json"
+            "training_stats.json"
         )
         # for resuming previous training
         if stats:
