@@ -160,11 +160,12 @@ class ModelFactory:
         print(f"loaded chexnet weights: {weights_path}")
         return base_model
 
-    def pop_conv_layers(self, base_model, layers_to_pop):
+    def pop_conv_layers(self, base_model, img_input, layers_to_pop):
         for i in range(layers_to_pop):
             base_model._layers.pop()
 
         base_model.outputs = [base_model.layers[-1].output]
+        base_model=Model(inputs=img_input, outputs=base_model.outputs, name='Visual_Model')
         return base_model
 
     def set_trainable_layers(self, base_model, layers_to_train):
@@ -185,9 +186,9 @@ class ModelFactory:
             visual_features = visual_model(downscaled_images)
             if classifier is not None:
                 predictions = classifier(visual_features)
-                loaded_model = Model(inputs=img_input, outputs=predictions)
+                loaded_model = Model(inputs=img_input, outputs=predictions, name='Pipeline')
             else:
-                loaded_model = Model(inputs=img_input, outputs=visual_features)
+                loaded_model = Model(inputs=img_input, outputs=visual_features, name='Pipeline')
         else:
             if classifier is not None:
                 predictions = classifier(base_model_output)
@@ -236,7 +237,7 @@ class ModelFactory:
             chexnet_classifier_exists = True
 
         if FLAGS.pop_conv_layers > 0:
-            base_model = self.pop_conv_layers(base_model, FLAGS.pop_conv_layers)
+            base_model = self.pop_conv_layers(base_model, base_model_img_input, FLAGS.pop_conv_layers)
             chexnet_classifier_exists = False
 
         if FLAGS.conv_layers_to_train != -1:
