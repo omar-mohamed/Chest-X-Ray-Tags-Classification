@@ -6,7 +6,7 @@ from tensorflow.keras import regularizers
 
 
 # method to return the dense classifier
-def get_classifier(input_length, multi_label_classification, layer_sizes=[100], output_size=2):
+def get_classifier(input_length, multi_label_classification, layer_sizes=[100], output_size=2, last_layer_activation = 'sigmoid'):
     model = Sequential(name='Classifier')
     model.add(Flatten(input_shape=[input_length]))
     for layer_size in layer_sizes:
@@ -16,7 +16,7 @@ def get_classifier(input_length, multi_label_classification, layer_sizes=[100], 
             model.add(Dense(layer_size, activation='relu'))
 
     if multi_label_classification:
-        model.add(Dense(output_size, activation='sigmoid', name="predictions"))
+        model.add(Dense(output_size, activation=last_layer_activation, name="predictions"))
     else:
         model.add(Dense(output_size, activation='softmax', name="predictions"))
 

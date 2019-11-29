@@ -247,8 +247,11 @@ class ModelFactory:
         if FLAGS.classes is not None and FLAGS.classes != [] and not chexnet_classifier_exists:
             base_model_output = base_model.layers[-1].output
             output_unrolled_length = self.get_output_unrolled_size(base_model_output.shape)
+            last_layer_activation = 'sigmoid'
+            if 'Hinge' in FLAGS.loss_function:
+                last_layer_activation = 'tanh'
             classifier = get_classifier(output_unrolled_length, FLAGS.multi_label_classification,
-                                        FLAGS.classifier_layer_sizes, len(FLAGS.classes))
+                                        FLAGS.classifier_layer_sizes, len(FLAGS.classes), last_layer_activation)
 
         loaded_model = self.concat_models(downscaling_model, base_model, classifier, img_input, base_model_img_input)
 

@@ -82,6 +82,7 @@ with open(os.path.join(FLAGS.save_model_path,'configs.json'), 'w') as fp:
 auroc = MultipleClassAUROC(
     sequence=test_generator,
     class_names=FLAGS.classes,
+    loss_function=FLAGS.loss_function,
     weights_path=os.path.join(FLAGS.save_model_path, 'latest_model.hdf5'),
     output_weights_path=os.path.join(FLAGS.save_model_path, 'best_model.hdf5'),
     confidence_thresh=FLAGS.multilabel_threshold,
