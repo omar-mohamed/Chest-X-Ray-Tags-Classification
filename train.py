@@ -3,7 +3,7 @@ from __future__ import absolute_import, division
 from visual_model_selector import ModelFactory
 from generator import AugmentedImageSequence
 from configs import argHandler  # Import the default arguments
-from model_utils import get_optimizer, get_class_weights
+from utils import get_optimizer, get_class_weights, get_loss_function
 from tensorflow.keras import metrics
 from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint, TensorBoard
 import os
@@ -60,7 +60,9 @@ else:
 opt = get_optimizer(FLAGS.optimizer_type, learning_rate)
 
 if FLAGS.multi_label_classification:
-    visual_model.compile(loss='binary_crossentropy', optimizer=opt,
+    loss_fun = get_loss_function(FLAGS.loss_function)
+
+    visual_model.compile(loss=loss_fun, optimizer=opt,
                          metrics=[metrics.BinaryAccuracy(threshold=FLAGS.multilabel_threshold)])
 else:
     visual_model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])

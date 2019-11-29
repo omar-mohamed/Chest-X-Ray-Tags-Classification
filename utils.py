@@ -23,6 +23,17 @@ def get_optimizer(optimizer_type, learning_rate, lr_decay=0):
     optimizer = optimizer_class(lr=learning_rate, decay=lr_decay)
     return optimizer
 
+def get_loss_function(loss_function):
+    if loss_function == 'focal_loss':
+        from focal_loss import FocalLoss
+        focal_loss = FocalLoss()
+        return focal_loss.compute_loss
+    elif loss_function == 'hamming_loss':
+        from hamming_loss import hamming_loss
+        return hamming_loss
+
+    return loss_function
+
 def save_model(model, save_path, model_name):
     try:
         os.makedirs(save_path)

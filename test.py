@@ -3,7 +3,7 @@ from __future__ import absolute_import, division
 from visual_model_selector import ModelFactory
 from generator import AugmentedImageSequence
 from configs import argHandler  # Import the default arguments
-from model_utils import set_gpu_usage, get_evaluation_metrics
+from utils import set_gpu_usage, get_evaluation_metrics
 from tensorflow.keras.models import load_model
 from tensorflow.keras import metrics
 

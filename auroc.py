@@ -101,7 +101,6 @@ class MultipleClassAUROC(Callback):
             self.stats["recall"] = rec
             self.stats["fscore"] = fscore
             self.stats["hamming_loss"] = ham_loss
-            self.stats["f1_score"] = ham_loss
             self.stats["exact_accuracy"] = exact_accuracy
 
             print("*********************************")
