@@ -24,15 +24,16 @@ def get_optimizer(optimizer_type, learning_rate, lr_decay=0):
     return optimizer
 
 def get_loss_function(loss_function):
-    if loss_function == 'focal_loss':
+    if loss_function == 'FocalLoss':
         from focal_loss import FocalLoss
         focal_loss = FocalLoss()
         return focal_loss.compute_loss
-    elif loss_function == 'hamming_loss':
+    elif loss_function == 'HammingLoss':
         from hamming_loss import hamming_loss
         return hamming_loss
-
-    return loss_function
+    else:
+        loss_class = getattr(importlib.import_module("tensorflow.keras.losses"), loss_function)
+        return loss_class()
 
 def save_model(model, save_path, model_name):
     try:
