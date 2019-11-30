@@ -47,7 +47,7 @@ class argHandler(dict):
         self.define('learning_rate_decay_factor', 0.1,
                     'Learning rate decay factor when validation loss stops decreasing')
         self.define('optimizer_type', 'Adam', 'Choose from (Adam, SGD, RMSprop, Adagrad, Adadelta, Adamax, Nadam)')
-        self.define('loss_function', 'Hinge',
+        self.define('loss_function', 'BinaryCrossentropy',
                     'Choose from (FocalLoss, HammingLoss, or any loss class from keras.losses like BinaryCrossentropy. The code automatically handles hinge loss of chosen.)')
         self.define('gpu_percentage', 0.95, 'gpu utilization. If 0 it will use the cpu')
         self.define('batch_size', 16, 'batch size for training and testing')
