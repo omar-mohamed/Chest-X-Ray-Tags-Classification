@@ -34,7 +34,7 @@ class argHandler(dict):
         self.define('conv_layers_to_train', -1,
                     'the number of layers that should be trained in the visual model counting from the end. -1 means train all and 0 means freezing the visual model')
         self.define('use_imagenet_weights', True, 'initialize the visual model with pretrained weights on imagenet')
-        self.define('pop_conv_layers', 0,
+        self.define('pop_conv_layers', 1,
                     'number of layers to be popped from the visual model. Note that the imagenet classifier is removed by default so you should not take them into considaration')
         self.define('final_layer_pooling', 'avg', 'the pooling to be used as a final layer to the visual model')
         self.define('load_model_path', '',
