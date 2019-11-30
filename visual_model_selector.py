@@ -165,7 +165,7 @@ class ModelFactory:
             base_model._layers.pop()
 
         base_model.outputs = [base_model.layers[-1].output]
-        base_model=Model(inputs=img_input, outputs=base_model.outputs, name='Visual_Model')
+        base_model = Model(inputs=img_input, outputs=base_model.outputs, name='Visual_Model')
         return base_model
 
     def set_trainable_layers(self, base_model, layers_to_train):
@@ -250,7 +250,7 @@ class ModelFactory:
             last_layer_activation = 'sigmoid'
             if 'Hinge' in FLAGS.loss_function:
                 last_layer_activation = 'tanh'
-            classifier = get_classifier(output_unrolled_length, FLAGS.multi_label_classification,
+            classifier = get_classifier(output_unrolled_length,
                                         FLAGS.classifier_layer_sizes, len(FLAGS.classes), last_layer_activation)
 
         loaded_model = self.concat_models(downscaling_model, base_model, classifier, img_input, base_model_img_input)

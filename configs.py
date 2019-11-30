@@ -1,11 +1,11 @@
 from classes import classes
+
+
 class argHandler(dict):
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
     _descriptions = {'help, --h, -h': 'show this super helpful message and exit'}
-
-
 
     def setDefaults(self):
         self.define('train_csv', './IU-XRay/training_set_manual_tags_100.csv',
@@ -20,20 +20,21 @@ class argHandler(dict):
                     'use pre-trained chexnet weights. Note only works with DenseNet121. If you use this option without popping layers it will have the classifier intact')
         self.define('chexnet_weights_path', 'pretrained_models/chexnet_densenet121_weights.h5', 'chexnet weights path')
         self.define('image_target_size', (224, 224, 3), 'the target size to resize the image')
-        self.define('cnn_downscaling_factor', 0, 'Controls the cnn layers responsible for downscaling the input image. if input image is 512x512 and downscaling factor is set to 2 then the downscaling cnn will output image with size 128x128. Note it is a learnable net and if set to 0 it will skip it')
+        self.define('cnn_downscaling_factor', 0,
+                    'Controls the cnn layers responsible for downscaling the input image. if input image is 512x512 and downscaling factor is set to 2 then the downscaling cnn will output image with size 128x128. Note it is a learnable net and if set to 0 it will skip it')
         self.define('cnn_downscaling_filters', 64, 'Number of filters in the downscaling model')
         self.define('num_epochs', 100, 'maximum number of epochs')
         self.define('csv_label_columns', ['Manual Tags'], 'the name of the label columns in the csv')
-        self.define('classes',classes,
+        self.define('classes', classes,
                     'the names of the output classes')
-        self.define('multi_label_classification', True,
-                    'determines if this is a multi classification problem or not. It affects the loss function')
+        self.define('multilabel_threshold', 0.5,
+                    'The threshold from which to detect a class.')
         self.define('classifier_layer_sizes', [],
                     'a list describing the hidden layers of the classifier. Example [10,0.4,5] will create a hidden layer with size 10 then dropout wth drop prob 0.4, then hidden layer with size 5. If empty it will connect to output nodes directly.')
         self.define('conv_layers_to_train', -1,
                     'the number of layers that should be trained in the visual model counting from the end. -1 means train all and 0 means freezing the visual model')
         self.define('use_imagenet_weights', True, 'initialize the visual model with pretrained weights on imagenet')
-        self.define('pop_conv_layers', 1,
+        self.define('pop_conv_layers', 0,
                     'number of layers to be popped from the visual model. Note that the imagenet classifier is removed by default so you should not take them into considaration')
         self.define('final_layer_pooling', 'avg', 'the pooling to be used as a final layer to the visual model')
         self.define('load_model_path', '',
@@ -46,19 +47,20 @@ class argHandler(dict):
         self.define('learning_rate_decay_factor', 0.1,
                     'Learning rate decay factor when validation loss stops decreasing')
         self.define('optimizer_type', 'Adam', 'Choose from (Adam, SGD, RMSprop, Adagrad, Adadelta, Adamax, Nadam)')
-        self.define('loss_function', 'BinaryCrossentropy', 'Choose from (FocalLoss, HammingLoss, or any loss class from keras.losses like BinaryCrossentropy)')
+        self.define('loss_function', 'Hinge',
+                    'Choose from (FocalLoss, HammingLoss, or any loss class from keras.losses like BinaryCrossentropy. The code automatically handles hinge loss of chosen.)')
         self.define('gpu_percentage', 0.95, 'gpu utilization. If 0 it will use the cpu')
         self.define('batch_size', 16, 'batch size for training and testing')
-        self.define('multilabel_threshold', 0.5,
-                    'The threshold from which to detect a class. Only used with multi label classification.')
         self.define('generator_workers', 4, 'The number of cpu workers generating batches.')
         self.define('generator_queue_length', 12, 'The maximum number of batches in the queue to be trained on.')
         self.define('minimum_learning_rate', 1e-7, 'The minimum possible learning rate when decaying')
         self.define('reduce_lr_patience', 4,
                     'The number of epochs to reduce the learning rate when validation loss is not decreasing')
         self.define('show_model_summary', True, 'A flag to show or hide the model summary')
-        self.define('positive_weights_multiply', 1.0, 'Controls the class_weight ratio between 0 and 1. Higher value means higher weighting of positive samples. Only works if use_class_balancing is set to true')
-        self.define('use_class_balancing', True, 'If set to true it will automatically balance the classes by settings class weights')
+        self.define('positive_weights_multiply', 1.0,
+                    'Controls the class_weight ratio between 0 and 1. Higher value means higher weighting of positive samples. Only works if use_class_balancing is set to true')
+        self.define('use_class_balancing', True,
+                    'If set to true it will automatically balance the classes by settings class weights')
 
     def define(self, argName, default, description):
         self[argName] = default

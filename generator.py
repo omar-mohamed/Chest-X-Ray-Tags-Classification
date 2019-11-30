@@ -13,7 +13,7 @@ class AugmentedImageSequence(Sequence):
     For more information of imgaug see: https://github.com/aleju/imgaug
     """
 
-    def __init__(self, dataset_csv_file, label_columns, multi_label_classification, class_names, source_image_dir,
+    def __init__(self, dataset_csv_file, label_columns, class_names, source_image_dir,
                  batch_size=16,
                  target_size=(224, 224), augmenter=None, verbose=0, steps=None,
                  shuffle_on_epoch_end=True, random_state=1):
@@ -36,7 +36,6 @@ class AugmentedImageSequence(Sequence):
         self.random_state = random_state
         self.class_names = class_names
         self.label_columns = label_columns
-        self.multi_label_classification = multi_label_classification
         self.current_step = -1
         self.prepare_dataset()
         if steps is None:
@@ -99,8 +98,6 @@ class AugmentedImageSequence(Sequence):
             """)
         return self.y[:self.steps * self.batch_size, :]
 
-    def get_sparse_labels(self, y):
-        return np.array([int(elem[0]) for elem in y[:, 0]]) - 1
 
     def classes_to_indices(self,classes):
         index=0
@@ -121,10 +118,8 @@ class AugmentedImageSequence(Sequence):
         return onehot
 
     def convert_labels_to_numbers(self, y):
-        if self.multi_label_classification:
             return self.get_onehot_labels(y)
-        else:
-            return self.get_sparse_labels(y)
+
 
     def prepare_dataset(self):
         df = self.dataset_df.sample(frac=1., random_state=self.random_state)

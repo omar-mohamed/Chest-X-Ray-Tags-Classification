@@ -20,7 +20,6 @@ def get_generator(csv_path, data_augmenter=None):
         dataset_csv_file=csv_path,
         label_columns=FLAGS.csv_label_columns,
         class_names=FLAGS.classes,
-        multi_label_classification=FLAGS.multi_label_classification,
         source_image_dir=FLAGS.image_directory,
         batch_size=FLAGS.batch_size,
         target_size=FLAGS.image_target_size,
@@ -45,21 +44,12 @@ def get_metrics_from_generator(generator,threshold=0.5, verbose=1):
     y = generator.get_y_true()
     get_evaluation_metrics(y_hat, y, FLAGS.classes, FLAGS.loss_function, threshold=threshold)
 
-if FLAGS.multi_label_classification:
-    visual_model.compile(loss='binary_crossentropy',
-                         metrics=[metrics.BinaryAccuracy(threshold=FLAGS.multilabel_threshold)])
+visual_model.compile(loss='binary_crossentropy',
+                     metrics=[metrics.BinaryAccuracy(threshold=FLAGS.multilabel_threshold)])
 
-    print("***************Train Metrics*********************")
-    get_metrics_from_generator(train_generator, FLAGS.multilabel_threshold)
-    print("***************Test Metrics**********************")
-    get_metrics_from_generator(test_generator, FLAGS.multilabel_threshold)
+print("***************Train Metrics*********************")
+get_metrics_from_generator(train_generator, FLAGS.multilabel_threshold)
+print("***************Test Metrics**********************")
+get_metrics_from_generator(test_generator, FLAGS.multilabel_threshold)
 
-else:
-    visual_model.compile(loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-    visual_model.evaluate_generator(
-        generator=test_generator,
-        steps=test_generator.steps,
-        workers=FLAGS.generator_workers,
-        max_queue_size=FLAGS.generator_queue_length,
-        verbose=1)

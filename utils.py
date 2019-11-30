@@ -44,7 +44,7 @@ def get_loss_function(loss_function):
         return loss_class()
 
 
-def classify_image(img, model, multi_label_classification, target_size=(224, 224, 3)):
+def classify_image(img, model, thresh = 0.5, target_size=(224, 224, 3)):
     # resize
     img = img / 255.
     img = resize(img, target_size)
@@ -55,11 +55,9 @@ def classify_image(img, model, multi_label_classification, target_size=(224, 224
     batch_x = (batch_x - imagenet_mean) / imagenet_std
     # predict
     predictions = model.predict(batch_x)
-    if multi_label_classification:
-        predictions[predictions >= 0.5] = 1
-        predictions[predictions < 0.5] = 0
-    else:
-        predictions = np.argmax(predictions, axis=1)
+    predictions[predictions >= thresh] = 1
+    predictions[predictions < thresh] = 0
+
     return predictions
 
 

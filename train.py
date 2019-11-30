@@ -25,7 +25,6 @@ def get_generator(csv_path, data_augmenter=None):
         dataset_csv_file=csv_path,
         label_columns=FLAGS.csv_label_columns,
         class_names=FLAGS.classes,
-        multi_label_classification=FLAGS.multi_label_classification,
         source_image_dir=FLAGS.image_directory,
         batch_size=FLAGS.batch_size,
         target_size=FLAGS.image_target_size,
@@ -38,7 +37,7 @@ train_generator = get_generator(FLAGS.train_csv, augmenter)
 test_generator = get_generator(FLAGS.test_csv)
 
 class_weights = None
-if FLAGS.use_class_balancing and FLAGS.multi_label_classification:
+if FLAGS.use_class_balancing:
     class_weights = get_class_weights(train_generator.y, FLAGS.positive_weights_multiply)
 
 # load classifier from saved weights or get a new one
@@ -59,14 +58,11 @@ else:
 
 opt = get_optimizer(FLAGS.optimizer_type, learning_rate)
 
-if FLAGS.multi_label_classification:
-    loss_fun = get_loss_function(FLAGS.loss_function)
+loss_fun = get_loss_function(FLAGS.loss_function)
 
-    visual_model.compile(loss=loss_fun, optimizer=opt,
-                         metrics=[metrics.BinaryAccuracy(threshold=FLAGS.multilabel_threshold)])
-else:
-    visual_model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-    training_stats_file = {}
+visual_model.compile(loss=loss_fun, optimizer=opt,
+                     metrics=[metrics.BinaryAccuracy(threshold=FLAGS.multilabel_threshold)])
+
 
 checkpoint = ModelCheckpoint(os.path.join(FLAGS.save_model_path, 'latest_model.hdf5'),
                              verbose=1)
