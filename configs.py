@@ -8,9 +8,9 @@ class argHandler(dict):
     _descriptions = {'help, --h, -h': 'show this super helpful message and exit'}
 
     def setDefaults(self):
-        self.define('train_csv', './IU-XRay/training_set_manual_tags_100.csv',
+        self.define('train_csv', './IU-XRay/training_set.csv',
                     'path to training csv containing the images names and the labels')
-        self.define('test_csv', './IU-XRay/testing_set_manual_tags_100.csv',
+        self.define('test_csv', './IU-XRay/testing_set.csv',
                     'path to testing csv containing the images names and the labels')
         self.define('image_directory', './IU-XRay/images',
                     'path to folder containing the patient folders which containg the images')
@@ -52,7 +52,7 @@ class argHandler(dict):
         self.define('gpu_percentage', 0.95, 'gpu utilization. If 0 it will use the cpu')
         self.define('batch_size', 16, 'batch size for training and testing')
         self.define('generator_workers', 4, 'The number of cpu workers generating batches.')
-        self.define('generator_queue_length', 12, 'The maximum number of batches in the queue to be trained on.')
+        self.define('generator_queue_length', 16, 'The maximum number of batches in the queue to be trained on.')
         self.define('minimum_learning_rate', 1e-7, 'The minimum possible learning rate when decaying')
         self.define('reduce_lr_patience', 4,
                     'The number of epochs to reduce the learning rate when validation loss is not decreasing')

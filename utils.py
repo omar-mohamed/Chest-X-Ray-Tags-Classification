@@ -8,8 +8,8 @@ from tensorflow.keras import backend as K
 import importlib
 from sklearn.metrics import roc_auc_score, precision_recall_fscore_support, average_precision_score, accuracy_score, \
     hamming_loss
-
-
+import pandas as pd
+from classes import classes
 def set_gpu_usage(gpu_memory_fraction):
     pass
     # if gpu_memory_fraction <= 1 and gpu_memory_fraction > 0:
@@ -61,7 +61,7 @@ def classify_image(img, model, thresh = 0.5, target_size=(224, 224, 3)):
     return predictions
 
 
-def get_evaluation_metrics(pred, labels, class_names, loss_function, threshold=0.5):
+def get_evaluation_metrics(pred, labels, class_names, loss_function, threshold=0.5,image_names=None, save_path = None):
     if 'Hinge' in loss_function:
         pred = normalize_hinge_output(pred)
     current_auroc = []
@@ -77,14 +77,76 @@ def get_evaluation_metrics(pred, labels, class_names, loss_function, threshold=0
     mean_auroc = np.mean(current_auroc)
     print(f"mean auroc: {mean_auroc}")
 
-    prec, rec, fscore, support = precision_recall_fscore_support(labels, pred >= threshold, average='macro')
     AP = average_precision_score(labels, pred)
-    exact_accuracy = accuracy_score(labels, pred >= threshold)
-    ham_loss = hamming_loss(labels, pred >= threshold)
-    print(
-        f"precision:{prec:.2f}, recall: {rec:.2f}, fscore: {fscore:.2f}, AP: {AP:.2f}, exact match accuracy: {exact_accuracy:.2f}, hamming loss: {ham_loss:.2f}")
-    return mean_auroc, prec, rec, fscore, AP, exact_accuracy, ham_loss
+    exact_accuracy,best_exact_thresh = get_best_exact_match(pred,labels)
+    prec, rec, fscore, support = precision_recall_fscore_support(labels, pred >= best_exact_thresh, average='macro')
+    if save_path is not None and image_names is not None:
+        save_exact_match_results(pred>=best_exact_thresh,labels,image_names,save_path)
+    ham_loss = hamming_loss(labels, pred >= best_exact_thresh)
+    print(f"precision:{prec:.2f}, recall: {rec:.2f}, fscore: {fscore:.2f}, AP: {AP:.2f}, exact match accuracy: {exact_accuracy:.2f}, hamming loss: {ham_loss:.2f}")
+    return mean_auroc, prec,rec,fscore, AP , exact_accuracy, ham_loss
 
+def get_str_label_rep(labels):
+    lst = []
+    for i in range(labels.shape[0]):
+        ones = np.where(labels[i,:] == True)[0]
+        lbls = [classes[i] for i in ones]
+
+        lst.append("/".join(lbls))
+    return lst
+
+def custom_save_model(model, save_path, model_name):
+    try:
+        os.makedirs(save_path)
+    except:
+        print("path already exists")
+
+    path = os.path.join(save_path, model_name)
+    # serialize model to JSON
+    model_json = model.to_json()
+    with open("{}.json".format(path), "w") as json_file:
+        json_file.write(model_json)
+    # serialize weights to HDF5
+    model.save_weights("{}.h5".format(path))
+    print("Saved model to disk")
+
+
+def custom_load_model(load_path, model_name):
+    path = os.path.join(load_path, model_name)
+
+    # load json and create model
+    json_file = open('{}.json'.format(path), 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    loaded_model = model_from_json(loaded_model_json)
+    # # load weights into new model
+    loaded_model.load_weights("{}.h5".format(path))
+    print("Loaded model from disk")
+    return loaded_model
+
+
+def save_exact_match_results(pred,labels,image_names,path):
+    pred = get_str_label_rep(pred)
+    labels = get_str_label_rep(labels)
+    match = [True if p==l else False for p,l in zip(pred,labels)]
+    csv_dict = {"image_name":image_names,"label":labels,"prediction":pred,"match":match}
+
+    df = pd.DataFrame(csv_dict)
+    df.to_csv(path,index=False)
+
+def get_best_exact_match(pred, labels, thresh_range=[0.01, 0.99], rate=0.01):
+    best_acc = 0
+    best_thresh = thresh_range[0]
+    thresh = thresh_range[0]
+    while(thresh <= thresh_range[1]):
+        exact_accuracy = accuracy_score(labels, pred >= thresh)
+        if exact_accuracy > best_acc:
+            best_acc = exact_accuracy
+            best_thresh = thresh
+        thresh +=rate
+    print(f"best exact match acc found: {best_acc} with thresh {best_thresh}")
+
+    return best_acc, best_thresh
 
 def get_sample_counts(labels):
     total_count = labels.shape[0]

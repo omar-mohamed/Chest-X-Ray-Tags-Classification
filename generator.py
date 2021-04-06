@@ -120,6 +120,8 @@ class AugmentedImageSequence(Sequence):
     def convert_labels_to_numbers(self, y):
             return self.get_onehot_labels(y)
 
+    def get_images_names(self):
+        return self.x_path
 
     def prepare_dataset(self):
         df = self.dataset_df.sample(frac=1., random_state=self.random_state)
