@@ -125,7 +125,7 @@ class AugmentedImageSequence(Sequence):
 
     def prepare_dataset(self):
         df = self.dataset_df.sample(frac=1., random_state=self.random_state)
-        self.x_path, self.y = df["Image Index"].as_matrix(), self.convert_labels_to_numbers(df[self.label_columns].as_matrix())
+        self.x_path, self.y = df["Image Index"].values, self.convert_labels_to_numbers(df[self.label_columns].values)
 
     def on_epoch_end(self):
         if self.shuffle:

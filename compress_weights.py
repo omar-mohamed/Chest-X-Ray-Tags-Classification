@@ -1,11 +1,12 @@
 import os
-from tensorflow.keras.models import model_from_json
-import efficientnet.tfkeras
 from tensorflow.keras.models import load_model
 from utils import custom_save_model
+from configs import argHandler  # Import the default arguments
 
+FLAGS = argHandler()
+FLAGS.setDefaults()
 
-model = load_model('./saved_model/chest_tags_efficientB4.hdf5')
+model = load_model(FLAGS.load_model_path)
 model.summary()
 
-custom_save_model(model,'./EfficientNetB4_100_16','chest_tags_effiecientB4')
+custom_save_model(model, os.path.dirname(FLAGS.load_model_path), 'model_compressed')
