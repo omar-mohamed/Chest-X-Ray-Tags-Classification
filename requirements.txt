@@ -2,7 +2,7 @@ imageio==2.5.0
 imgaug==0.3.0
 matplotlib==3.1.1
 networkx==2.3
-Pillow==6.1.0
+Pillow==9.0.0
 scikit-image==0.15.0
 scikit-learn==0.21.3
 Shapely==1.7.1
