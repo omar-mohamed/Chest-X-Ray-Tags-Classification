@@ -6,7 +6,7 @@ Pillow==6.1.0
 scikit-image==0.15.0
 scikit-learn==0.21.3
 Shapely==1.7.1
-tensorflow==2.1.0
+tensorflow==2.5.3
 efficientnet==1.1.0
 numpy==1.17.2
 pandas==0.25.1
