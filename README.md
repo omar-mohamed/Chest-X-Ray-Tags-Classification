@@ -7,6 +7,12 @@ We fine-tune a pre-trained Chexnet model to classify multiple tags given chest X
 
 ![image](https://user-images.githubusercontent.com/6074821/113486630-29b9d200-94b4-11eb-8189-dfc91793b3f8.png)
 
+## Installation & Usage
+*The project was tested on a virtual environment of python 3.7, pip 23.2.1, and MacOS*
+- pip install -r full_requirements.txt (or pip install -r requirements.txt if there are errors because of using a different operating system, as requirements.txt only contains the main dependencies and pip will fetch the compatible sub-dependencies, but it will be slower)
+- python get_iu_xray.py (to download the dataset)
+- python train.py
+
 ## Related Repositories
 - CDGPT2 repository (main paper repo) [here](https://github.com/omar-mohamed/GPT2-Chest-X-Ray-Report-Generation).
 - VSGRU repository [here](https://github.com/omar-mohamed/X-Ray-Report-Generation).
