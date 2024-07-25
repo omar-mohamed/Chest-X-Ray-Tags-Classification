@@ -3,6 +3,9 @@ This is the implementation of the visual model mentioned in our paper 'Automated
 
 Paper link [here](https://doi.org/10.1016/j.imu.2021.100557).
 
+Thesis link [here](https://drive.google.com/file/d/1_FJdRVs5Saoqep6Gz40d_0nLsLbAgMeI/view?usp=drive_link).
+
+
 We fine-tune a pre-trained Chexnet model to classify multiple tags given chest X-ray images from the IU-X-Ray dataset.
 
 ![image](https://user-images.githubusercontent.com/6074821/113486630-29b9d200-94b4-11eb-8189-dfc91793b3f8.png)
